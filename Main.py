@@ -14,6 +14,9 @@ from sklearn import datasets
 irisDataset = datasets.load_iris()
 # Dataset Shuffle and Split Funtion
 from sklearn.model_selection import train_test_split
+# Preprocesing Functions
+from sklearn.preprocessing import LabelEncoder
+from keras.utils import to_categorical
 
 
 # Models and Layers
@@ -24,8 +27,12 @@ from keras.layers.core import Dense
 
 #Transform <class 'sklearn.utils.Bunch'>  to  <class 'pandas.core.frame.DataFrame'>
 irisDataframe = pd.DataFrame(irisDataset["data"],columns=irisDataset["feature_names"])
+
+#Encoding the target Data in "One Hot Encoding"
+targetOneHot = to_categorical(pd.Series(irisDataset["target"]))
+
 # Dataset Shuffle and Split
-vars_train, vars_test, target_train, target_test = train_test_split(irisDataframe, pd.Series(irisDataset["target"]))
+vars_train, vars_test, target_train, target_test = train_test_split(irisDataframe, targetOneHot )
 
 
 print(vars_train)
@@ -51,5 +58,12 @@ print(model.summary())
 model.fit(vars_train, target_train, epochs=100)
 
 
-#scores = model.evaluate(vars_train, target_train)
-#print("\nScores %s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+scores = model.evaluate(vars_train, target_train)
+print("\nScores of Train Data %s: %.2f%%" % (model.metrics_names, scores*100))
+
+scores = model.evaluate(vars_test, target_test)
+print("\nScores of Test Data %s: %.2f%%" % (model.metrics_names, scores*100))
+
+print(model.predict(np.array([[5.1,3.5,1.4,0.2]], "float32")))
+
+
